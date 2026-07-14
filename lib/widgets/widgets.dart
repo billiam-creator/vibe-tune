@@ -4,50 +4,34 @@ import 'package:shimmer/shimmer.dart';
 import '../theme/app_theme.dart';
 import '../models/models.dart';
 
-// ─── Flame Badge ───────────────────────────────────────────────────────────────
 class FlameBadge extends StatelessWidget {
   final int count;
   final bool small;
   const FlameBadge({super.key, required this.count, this.small = false});
-
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          '🔥',
-          style: TextStyle(fontSize: small ? 10 : 13),
-        ),
+        Text('🔥', style: TextStyle(fontSize: small ? 10 : 13)),
         const SizedBox(width: 2),
-        Text(
-          '$count',
-          style: TextStyle(
-            color: VibeTuneTheme.accent,
-            fontWeight: FontWeight.w800,
-            fontSize: small ? 10 : 13,
-          ),
-        ),
+        Text('$count',
+            style: TextStyle(color: VibeTuneTheme.accent, fontWeight: FontWeight.w800, fontSize: small ? 10 : 13)),
       ],
     );
   }
 }
 
-// ─── Trend Tag ─────────────────────────────────────────────────────────────────
 class TrendTag extends StatelessWidget {
   final String trend;
   const TrendTag({super.key, required this.trend});
 
   Color get color {
     switch (trend) {
-      case 'NEW':
-        return VibeTuneTheme.neonGreen;
-      case 'HOT':
-        return VibeTuneTheme.primary;
-      case 'RISING':
-        return VibeTuneTheme.accent;
-      default:
-        return VibeTuneTheme.textMuted;
+      case 'NEW': return VibeTuneTheme.neonGreen;
+      case 'HOT': return VibeTuneTheme.primary;
+      case 'RISING': return VibeTuneTheme.accent;
+      default: return VibeTuneTheme.textMuted;
     }
   }
 
@@ -60,20 +44,12 @@ class TrendTag extends StatelessWidget {
         borderRadius: BorderRadius.circular(2),
         color: color.withOpacity(0.1),
       ),
-      child: Text(
-        trend,
-        style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.2,
-        ),
-      ),
+      child: Text(trend,
+          style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
     );
   }
 }
 
-// ─── Network Image with Shimmer ─────────────────────────────────────────────────
 class VibeCachedImage extends StatelessWidget {
   final String url;
   final double? width;
@@ -81,58 +57,35 @@ class VibeCachedImage extends StatelessWidget {
   final BoxFit fit;
   final BorderRadius? borderRadius;
 
-  const VibeCachedImage({
-    super.key,
-    required this.url,
-    this.width,
-    this.height,
-    this.fit = BoxFit.cover,
-    this.borderRadius,
-  });
+  const VibeCachedImage({super.key, required this.url, this.width, this.height, this.fit = BoxFit.cover, this.borderRadius});
 
   @override
   Widget build(BuildContext context) {
+    if (url.isEmpty) {
+      return Container(width: width, height: height, color: VibeTuneTheme.card,
+          child: const Icon(Icons.music_note, color: VibeTuneTheme.textMuted));
+    }
     Widget img = CachedNetworkImage(
-      imageUrl: url,
-      width: width,
-      height: height,
-      fit: fit,
+      imageUrl: url, width: width, height: height, fit: fit,
       placeholder: (context, url) => Shimmer.fromColors(
         baseColor: const Color(0xFF1A1A1A),
         highlightColor: const Color(0xFF2A2A2A),
-        child: Container(
-          width: width,
-          height: height,
-          color: const Color(0xFF1A1A1A),
-        ),
+        child: Container(width: width, height: height, color: const Color(0xFF1A1A1A)),
       ),
-      errorWidget: (context, url, error) => Container(
-        width: width,
-        height: height,
-        color: const Color(0xFF1A1A1A),
-        child: const Icon(Icons.music_note, color: VibeTuneTheme.textMuted),
-      ),
+      errorWidget: (context, url, error) => Container(width: width, height: height,
+          color: VibeTuneTheme.card, child: const Icon(Icons.music_note, color: VibeTuneTheme.textMuted)),
     );
-
-    if (borderRadius != null) {
-      return ClipRRect(borderRadius: borderRadius!, child: img);
-    }
+    if (borderRadius != null) return ClipRRect(borderRadius: borderRadius!, child: img);
     return img;
   }
 }
 
-// ─── Section Header ─────────────────────────────────────────────────────────────
 class SectionHeader extends StatelessWidget {
   final String title;
   final String? actionText;
   final VoidCallback? onAction;
 
-  const SectionHeader({
-    super.key,
-    required this.title,
-    this.actionText,
-    this.onAction,
-  });
+  const SectionHeader({super.key, required this.title, this.actionText, this.onAction});
 
   @override
   Widget build(BuildContext context) {
@@ -142,27 +95,13 @@ class SectionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: VibeTuneTheme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.5,
-            ),
-          ),
+          Text(title,
+              style: const TextStyle(color: VibeTuneTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
           if (actionText != null)
             GestureDetector(
               onTap: onAction,
-              child: Text(
-                actionText!,
-                style: const TextStyle(
-                  color: VibeTuneTheme.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
-                ),
-              ),
+              child: Text(actionText!,
+                  style: const TextStyle(color: VibeTuneTheme.primary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
             ),
         ],
       ),
@@ -170,12 +109,12 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
-// ─── Artist Card (Grid) ─────────────────────────────────────────────────────────
 class ArtistGridCard extends StatelessWidget {
   final Artist artist;
   final VoidCallback? onTap;
+  final VoidCallback? onFlame;
 
-  const ArtistGridCard({super.key, required this.artist, this.onTap});
+  const ArtistGridCard({super.key, required this.artist, this.onTap, this.onFlame});
 
   @override
   Widget build(BuildContext context) {
@@ -196,30 +135,19 @@ class ArtistGridCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   VibeCachedImage(url: artist.imageUrl, fit: BoxFit.cover),
-                  // gradient overlay
                   Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
+                    bottom: 0, left: 0, right: 0,
                     child: Container(
                       height: 80,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.9),
-                            Colors.transparent,
-                          ],
+                          begin: Alignment.bottomCenter, end: Alignment.topCenter,
+                          colors: [Colors.black.withOpacity(0.9), Colors.transparent],
                         ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: TrendTag(trend: artist.trend),
-                  ),
+                  Positioned(top: 8, right: 8, child: TrendTag(trend: artist.trend)),
                 ],
               ),
             ),
@@ -228,31 +156,18 @@ class ArtistGridCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    artist.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: VibeTuneTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  Text(artist.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: VibeTuneTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.5)),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        artist.genre.toUpperCase(),
-                        style: const TextStyle(
-                          color: VibeTuneTheme.textMuted,
-                          fontSize: 9,
-                          letterSpacing: 1,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Text(artist.genre.toUpperCase(),
+                          style: const TextStyle(color: VibeTuneTheme.textMuted, fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w600)),
+                      GestureDetector(
+                        onTap: onFlame,
+                        child: FlameBadge(count: artist.flameCount, small: true),
                       ),
-                      FlameBadge(count: artist.flames, small: true),
                     ],
                   ),
                 ],
@@ -265,17 +180,13 @@ class ArtistGridCard extends StatelessWidget {
   }
 }
 
-// ─── Track Row ──────────────────────────────────────────────────────────────────
 class TrackRow extends StatelessWidget {
   final Track track;
   final int? rank;
+  final VoidCallback? onPlay;
+  final VoidCallback? onLike;
 
-  const TrackRow({super.key, required this.track, this.rank});
-
-  String _formatPlays(int plays) {
-    if (plays >= 1000) return '${(plays / 1000).toStringAsFixed(1)}K';
-    return plays.toString();
-  }
+  const TrackRow({super.key, required this.track, this.rank, this.onPlay, this.onLike});
 
   @override
   Widget build(BuildContext context) {
@@ -290,89 +201,37 @@ class TrackRow extends StatelessWidget {
       child: Row(
         children: [
           if (rank != null) ...[
-            SizedBox(
-              width: 28,
-              child: Text(
-                rank.toString().padLeft(2, '0'),
-                style: const TextStyle(
-                  color: VibeTuneTheme.textMuted,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
+            SizedBox(width: 28,
+                child: Text(rank.toString().padLeft(2, '0'),
+                    style: const TextStyle(color: VibeTuneTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w900))),
             const SizedBox(width: 8),
           ],
-          VibeCachedImage(
-            url: track.coverUrl,
-            width: 48,
-            height: 48,
-            borderRadius: BorderRadius.circular(4),
-          ),
+          VibeCachedImage(url: track.imageUrl, width: 48, height: 48, borderRadius: BorderRadius.circular(4)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  track.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: VibeTuneTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
+                Text(track.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: VibeTuneTheme.textPrimary, fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 2),
-                Text(
-                  track.artist,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: VibeTuneTheme.textSecondary,
-                    fontSize: 11,
-                  ),
-                ),
+                Text(track.artistName, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: VibeTuneTheme.textSecondary, fontSize: 11)),
+                Text('${track.formattedPlays} plays',
+                    style: const TextStyle(color: VibeTuneTheme.textMuted, fontSize: 10)),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (track.isNew) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: VibeTuneTheme.neonGreen.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: const Text(
-                    'NEW',
-                    style: TextStyle(
-                      color: VibeTuneTheme.neonGreen,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 4),
-              Text(
-                '${_formatPlays(track.plays)} plays',
-                style: const TextStyle(
-                  color: VibeTuneTheme.textMuted,
-                  fontSize: 10,
-                ),
-              ),
-            ],
+          GestureDetector(
+            onTap: onLike,
+            child: Icon(track.isLiked ? Icons.favorite : Icons.favorite_border,
+                color: track.isLiked ? VibeTuneTheme.primary : VibeTuneTheme.textMuted, size: 18),
           ),
           const SizedBox(width: 8),
-          const Icon(
-            Icons.play_circle_fill,
-            color: VibeTuneTheme.primary,
-            size: 32,
+          GestureDetector(
+            onTap: onPlay,
+            child: const Icon(Icons.play_circle_fill, color: VibeTuneTheme.primary, size: 32),
           ),
         ],
       ),
@@ -380,61 +239,12 @@ class TrackRow extends StatelessWidget {
   }
 }
 
-// ─── Vibe Category Chip ─────────────────────────────────────────────────────────
-class VibeCategoryChip extends StatelessWidget {
-  final VibeCategory category;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const VibeCategoryChip({
-    super.key,
-    required this.category,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? category.color.withOpacity(0.2) : VibeTuneTheme.card,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: isSelected ? category.color : VibeTuneTheme.cardBorder,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(category.emoji, style: const TextStyle(fontSize: 14)),
-            const SizedBox(width: 6),
-            Text(
-              category.name,
-              style: TextStyle(
-                color: isSelected ? category.color : VibeTuneTheme.textSecondary,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Top Chart Row ──────────────────────────────────────────────────────────────
 class TopChartArtistRow extends StatelessWidget {
   final Artist artist;
   final int rank;
+  final VoidCallback? onFlame;
 
-  const TopChartArtistRow({super.key, required this.artist, required this.rank});
+  const TopChartArtistRow({super.key, required this.artist, required this.rank, this.onFlame});
 
   @override
   Widget build(BuildContext context) {
@@ -442,63 +252,31 @@ class TopChartArtistRow extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: rank == 1
-            ? VibeTuneTheme.primary.withOpacity(0.08)
-            : VibeTuneTheme.card,
+        color: rank == 1 ? VibeTuneTheme.primary.withOpacity(0.08) : VibeTuneTheme.card,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: rank == 1
-              ? VibeTuneTheme.primary.withOpacity(0.3)
-              : VibeTuneTheme.cardBorder,
-        ),
+        border: Border.all(color: rank == 1 ? VibeTuneTheme.primary.withOpacity(0.3) : VibeTuneTheme.cardBorder),
       ),
       child: Row(
         children: [
-          SizedBox(
-            width: 32,
-            child: Text(
-              rank.toString().padLeft(2, '0'),
-              style: TextStyle(
-                color: rank == 1 ? VibeTuneTheme.primary : VibeTuneTheme.textMuted,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
+          SizedBox(width: 32,
+              child: Text(rank.toString().padLeft(2, '0'),
+                  style: TextStyle(color: rank == 1 ? VibeTuneTheme.primary : VibeTuneTheme.textMuted,
+                      fontSize: 16, fontWeight: FontWeight.w900))),
           const SizedBox(width: 8),
-          VibeCachedImage(
-            url: artist.imageUrl,
-            width: 44,
-            height: 44,
-            borderRadius: BorderRadius.circular(22),
-          ),
+          VibeCachedImage(url: artist.imageUrl, width: 44, height: 44, borderRadius: BorderRadius.circular(22)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  artist.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: VibeTuneTheme.textPrimary,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  artist.genre.toUpperCase(),
-                  style: const TextStyle(
-                    color: VibeTuneTheme.textMuted,
-                    fontSize: 10,
-                    letterSpacing: 1,
-                  ),
-                ),
+                Text(artist.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: VibeTuneTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 13)),
+                Text(artist.genre.toUpperCase(),
+                    style: const TextStyle(color: VibeTuneTheme.textMuted, fontSize: 10, letterSpacing: 1)),
               ],
             ),
           ),
-          FlameBadge(count: artist.flames),
+          GestureDetector(onTap: onFlame, child: FlameBadge(count: artist.flameCount)),
           const SizedBox(width: 8),
           TrendTag(trend: artist.trend),
         ],

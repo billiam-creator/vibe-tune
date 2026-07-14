@@ -12,8 +12,12 @@ dependencies:
   google_fonts: ^6.1.0
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
-  flutter_staggered_animations: ^1.1.1
   smooth_page_indicator: ^1.1.0
+  http: ^1.2.0
+  shared_preferences: ^2.2.2
+  uuid: ^4.3.3
+  timeago: ^3.6.1
+  flutter_staggered_animations: ^1.1.1
 
 dev_dependencies:
   flutter_test:

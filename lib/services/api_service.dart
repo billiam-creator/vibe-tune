@@ -94,7 +94,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/artists/$artistId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'action': 'toggleLike', 'deviceId': deviceId}),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200;
     } catch (_) {
       return false;
@@ -108,7 +108,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/tracks/$trackId/play'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'deviceId': deviceId}),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200;
     } catch (_) {
       return false;
@@ -122,7 +122,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/tracks/$trackId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'action': 'toggleLike', 'deviceId': deviceId}),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200;
     } catch (_) {
       return false;
@@ -147,7 +147,7 @@ class ApiService {
           'text': text,
           if (trackId != null) 'trackId': trackId,
         }),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200 || res.statusCode == 201;
     } catch (_) {
       return false;
@@ -161,7 +161,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/comments/$commentId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'action': 'toggleLike', 'deviceId': deviceId}),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200;
     } catch (_) {
       return false;
@@ -188,7 +188,7 @@ class ApiService {
         Uri.parse('$_baseUrl/api/profiles/$deviceId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'username': username, 'handle': handle}),
-      );
+      ).timeout(const Duration(seconds: 10));
       return res.statusCode == 200 || res.statusCode == 201;
     } catch (_) {
       return false;

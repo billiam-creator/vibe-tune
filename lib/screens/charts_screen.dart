@@ -101,7 +101,7 @@ class _ChartsScreenState extends State<ChartsScreen>
 
   Widget _buildArtistChart() {
     final sorted = [...AppData.featuredArtists]
-      ..sort((a, b) => b.flames.compareTo(a.flames));
+      ..sort((a, b) => b.flameCount.compareTo(a.flameCount));
     return ListView.builder(
       padding: const EdgeInsets.only(top: 12, bottom: 40),
       itemCount: sorted.length,
@@ -112,7 +112,7 @@ class _ChartsScreenState extends State<ChartsScreen>
 
   Widget _buildTrackChart() {
     final all = [...AppData.trendingTracks, ...AppData.freshDrops];
-    all.sort((a, b) => b.plays.compareTo(a.plays));
+    all.sort((a, b) => b.playCount.compareTo(a.playCount));
     return ListView.builder(
       padding: const EdgeInsets.only(top: 12, bottom: 40),
       itemCount: all.length,

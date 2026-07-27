@@ -12,8 +12,11 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  await AppState.instance.init();
   runApp(const VibeTuneApp());
+  // Don't block the first frame on the network — load data in the
+  // background so the app always renders even if the API is slow,
+  // unreachable, or a single record fails to parse.
+  AppState.instance.init();
 }
 
 class VibeTuneApp extends StatelessWidget {

@@ -20,46 +20,124 @@ class AppState extends ChangeNotifier {
   String? userHandle;
 
   Future<void> init() async {
-    _deviceId = await ApiService.instance.getDeviceId();
-    final profile = await ApiService.instance.getProfile();
-    if (profile != null) {
-      userProfile = profile['username']?.toString();
-      userHandle = profile['handle']?.toString();
+    try {
+      _deviceId = await ApiService.instance.getDeviceId();
+      final profile = await ApiService.instance.getProfile();
+      if (profile != null) {
+        userProfile = profile['username']?.toString();
+        userHandle = profile['handle']?.toString();
+      }
+    } catch (e) {
+      debugPrint('AppState.init profile error: $e');
     }
+    // Run independently so one failing section doesn't block the others.
     await Future.wait([loadArtists(), loadTracks(), loadComments(), loadGenres()]);
   }
 
   Future<void> loadArtists() async {
     loadingArtists = true;
     notifyListeners();
-    final data = await ApiService.instance.getArtists();
-    artists = data.map((j) => Artist.fromJson(j)).toList();
+    try {
+      final data = await ApiService.instance.getArtists();
+      artists = data
+          .map((j) {
+            try {
+              return Artist.fromJson(j);
+            } catch (e) {
+              debugPrint('Skipping malformed artist: $e');
+              return null;
+            }
+          })
+          .whereType<Artist>()
+          .toList();
+    } catch (e) {
+      debugPrint('loadArtists error: $e');
+    }
     loadingArtists = false;
+    _syncTrackArtistNames();
     notifyListeners();
   }
 
   Future<void> loadTracks() async {
     loadingTracks = true;
     notifyListeners();
-    final data = await ApiService.instance.getTracks();
-    tracks = data.map((j) => Track.fromJson(j)).toList();
+    try {
+      final data = await ApiService.instance.getTracks();
+      tracks = data
+          .map((j) {
+            try {
+              return Track.fromJson(j);
+            } catch (e) {
+              debugPrint('Skipping malformed track: $e');
+              return null;
+            }
+          })
+          .whereType<Track>()
+          .toList();
+    } catch (e) {
+      debugPrint('loadTracks error: $e');
+    }
     loadingTracks = false;
+    _syncTrackArtistNames();
     notifyListeners();
+  }
+
+  // The API doesn't embed an artistName on track/release documents — only
+  // artistId. Resolve display names locally from the loaded artists list so
+  // tracks don't show blank artist names. Safe to call before artists have
+  // loaded; it's re-run whenever either list refreshes.
+  void _syncTrackArtistNames() {
+    if (artists.isEmpty || tracks.isEmpty) return;
+    final byId = {for (final a in artists) a.id: a.name};
+    for (final t in tracks) {
+      final name = byId[t.artistId];
+      if (name != null && name.isNotEmpty) {
+        t.artistName = name;
+      }
+    }
   }
 
   Future<void> loadComments() async {
     loadingComments = true;
     notifyListeners();
-    final data = await ApiService.instance.getComments();
-    comments = data.map((j) => Comment.fromJson(j)).toList();
+    try {
+      final data = await ApiService.instance.getComments();
+      comments = data
+          .map((j) {
+            try {
+              return Comment.fromJson(j);
+            } catch (e) {
+              debugPrint('Skipping malformed comment: $e');
+              return null;
+            }
+          })
+          .whereType<Comment>()
+          .toList();
+    } catch (e) {
+      debugPrint('loadComments error: $e');
+    }
     loadingComments = false;
     notifyListeners();
   }
 
   Future<void> loadGenres() async {
-    final data = await ApiService.instance.getGenres();
-    genres = data.map((j) => VibeGenre.fromJson(j)).toList();
-    notifyListeners();
+    try {
+      final data = await ApiService.instance.getGenres();
+      genres = data
+          .map((j) {
+            try {
+              return VibeGenre.fromJson(j);
+            } catch (e) {
+              debugPrint('Skipping malformed genre: $e');
+              return null;
+            }
+          })
+          .whereType<VibeGenre>()
+          .toList();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('loadGenres error: $e');
+    }
   }
 
   Future<void> toggleArtistFlame(Artist artist) async {

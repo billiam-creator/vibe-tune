@@ -95,14 +95,22 @@ class SectionHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(title,
-              style: const TextStyle(color: VibeTuneTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
-          if (actionText != null)
+          Expanded(
+            child: Text(title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: VibeTuneTheme.textPrimary, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+          ),
+          if (actionText != null) ...[
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: onAction,
               child: Text(actionText!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: VibeTuneTheme.primary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
             ),
+          ],
         ],
       ),
     );

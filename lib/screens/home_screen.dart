@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../services/app_state.dart';
 import '../models/models.dart';
 import '../widgets/widgets.dart';
+import 'artist_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,18 +24,22 @@ class _HomeScreenState extends State<HomeScreen> {
       'subtitle': 'Uncover Kenya\'s Rising Underground Artists.',
       'cta': 'EXPLORE NOW',
       'image': 'https://ik.imagekit.io/nwsbzz0pe/vibetune/1000690978_W3x3JegNr.jpg',
+      'tab': '1', // Explore — matches the website's EXPLORE NOW button
     },
     {
       'title': 'THE WAVE IS\nHERE',
       'subtitle': 'Book talent for your next video shoot.',
       'cta': 'BOOK TALENT',
       'image': 'https://ik.imagekit.io/nwsbzz0pe/vibetune/2e528f18-fce9-4d63-a17a-625149463c2a-1_all_8437_BE5ZBJgta.jpg',
+      'tab': '1', // Explore — no dedicated booking flow exists yet, so this
+                  // surfaces artists you could reach out to, same as the site.
     },
     {
       'title': 'STREET\nROOTED',
       'subtitle': 'Built by the streets, for the world.',
       'cta': 'JOIN THE SCENE',
       'image': 'https://ik.imagekit.io/nwsbzz0pe/vibetune/1000702973_fZhghUXTj.jpg',
+      'tab': '3', // Community
     },
   ];
 
@@ -46,6 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onStateChange() => setState(() {});
+
+  void _openArtist(Artist artist) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ArtistDetailScreen(artist: artist)),
+    );
+  }
 
   void _startAutoPlay() {
     Future.delayed(const Duration(seconds: 5), () {
@@ -100,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SectionHeader(
                 title: "THIS WEEK'S TOP 4",
                 actionText: 'VIEW FULL RANKINGS →',
-                onAction: () {},
+                onAction: () => _state.switchTab(2),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
@@ -112,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         artist: topArtists[i],
                         rank: i + 1,
                         onFlame: () => _state.toggleArtistFlame(topArtists[i]),
+                        onTap: () => _openArtist(topArtists[i]),
                       ),
                       childCount: topArtists.length,
                     ),
@@ -120,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // TRENDING
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
             SliverToBoxAdapter(
-              child: SectionHeader(title: 'TRENDING NOW', actionText: 'SEE ALL →', onAction: () {}),
+              child: SectionHeader(title: 'TRENDING NOW', actionText: 'SEE ALL →', onAction: () => _state.switchTab(2)),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
@@ -132,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // FRESH DROPS
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
             SliverToBoxAdapter(
-              child: SectionHeader(title: 'FRESH DROPS', actionText: 'SEE ALL →', onAction: () {}),
+              child: SectionHeader(title: 'FRESH DROPS', actionText: 'SEE ALL →', onAction: () => _state.switchTab(2)),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             _state.loadingTracks
@@ -141,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => TrackRow(
                         track: fresh[i],
-                        onPlay: () => _state.playTrack(fresh[i]),
+                        onPlay: () => _state.playTrack(fresh[i], queue: fresh),
                         onLike: () => _state.toggleTrackLike(fresh[i]),
                       ),
                       childCount: fresh.length,
@@ -157,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // FEATURED ARTISTS
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
             SliverToBoxAdapter(
-              child: SectionHeader(title: 'FEATURED ARTISTS', actionText: 'VIEW ALL →', onAction: () {}),
+              child: SectionHeader(title: 'FEATURED ARTISTS', actionText: 'VIEW ALL →', onAction: () => _state.switchTab(1)),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             _state.loadingArtists
@@ -174,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, i) => ArtistGridCard(
                           artist: allArtists[i],
-                          onTap: () {},
+                          onTap: () => _openArtist(allArtists[i]),
                           onFlame: () => _state.toggleArtistFlame(allArtists[i]),
                         ),
                         childCount: allArtists.length,
@@ -231,11 +243,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(slide['subtitle']!,
                             style: const TextStyle(color: VibeTuneTheme.textSecondary, fontSize: 14)),
                         const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          color: VibeTuneTheme.primary,
-                          child: Text(slide['cta']!,
-                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                        GestureDetector(
+                          onTap: () => _state.switchTab(int.parse(slide['tab']!)),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            color: VibeTuneTheme.primary,
+                            child: Text(slide['cta']!,
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                          ),
                         ),
                       ],
                     ),

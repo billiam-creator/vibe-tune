@@ -194,4 +194,48 @@ class ApiService {
       return false;
     }
   }
+
+  // Fetches a 30-second Spotify preview clip URL for a track's spotifyUrl,
+  // mirroring the website's playback behavior (AudioContext.tsx). Returns
+  // null if no preview is available so the caller can fall back gracefully.
+  Future<String?> getSpotifyPreview(String spotifyUrl) async {
+    try {
+      final res = await http
+          .get(Uri.parse('$_baseUrl/api/spotify/preview?url=${Uri.encodeComponent(spotifyUrl)}'))
+          .timeout(const Duration(seconds: 10));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        final preview = data['previewUrl'];
+        return (preview is String && preview.isNotEmpty) ? preview : null;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Submits a "Join The Scene" artist application — mirrors the website's
+  // ArtistApplicationModal, which POSTs to /api/applications.
+  Future<bool> submitArtistApplication({
+    required String artistName,
+    required String email,
+    String? socialHandle,
+    required String musicLink,
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$_baseUrl/api/applications'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'artistName': artistName,
+          'email': email,
+          'socialHandle': socialHandle ?? '',
+          'musicLink': musicLink,
+        }),
+      ).timeout(const Duration(seconds: 10));
+      return res.statusCode == 200 || res.statusCode == 201;
+    } catch (_) {
+      return false;
+    }
+  }
 }

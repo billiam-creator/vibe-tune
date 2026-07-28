@@ -243,12 +243,15 @@ class TopChartArtistRow extends StatelessWidget {
   final Artist artist;
   final int rank;
   final VoidCallback? onFlame;
+  final VoidCallback? onTap;
 
-  const TopChartArtistRow({super.key, required this.artist, required this.rank, this.onFlame});
+  const TopChartArtistRow({super.key, required this.artist, required this.rank, this.onFlame, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -280,6 +283,7 @@ class TopChartArtistRow extends StatelessWidget {
           const SizedBox(width: 8),
           TrendTag(trend: artist.trend),
         ],
+      ),
       ),
     );
   }

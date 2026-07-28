@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../data/app_data.dart';
+import '../services/app_state.dart';
+import '../models/models.dart';
 import '../widgets/widgets.dart';
+import 'artist_detail_screen.dart';
 
 class ChartsScreen extends StatefulWidget {
   const ChartsScreen({super.key});
@@ -13,15 +15,26 @@ class ChartsScreen extends StatefulWidget {
 class _ChartsScreenState extends State<ChartsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final AppState _state = AppState.instance;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _state.addListener(_onStateChange);
+  }
+
+  void _onStateChange() => setState(() {});
+
+  void _openArtist(Artist artist) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ArtistDetailScreen(artist: artist)),
+    );
   }
 
   @override
   void dispose() {
+    _state.removeListener(_onStateChange);
     _tabController.dispose();
     super.dispose();
   }
@@ -100,35 +113,79 @@ class _ChartsScreenState extends State<ChartsScreen>
   }
 
   Widget _buildArtistChart() {
-    final sorted = [...AppData.featuredArtists]
+    if (_state.loadingArtists) {
+      return const Center(
+        child: CircularProgressIndicator(color: VibeTuneTheme.primary),
+      );
+    }
+    final sorted = [..._state.artists]
       ..sort((a, b) => b.flameCount.compareTo(a.flameCount));
+    if (sorted.isEmpty) {
+      return const Center(
+        child: Text('No artists yet.', style: TextStyle(color: VibeTuneTheme.textMuted)),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.only(top: 12, bottom: 40),
       itemCount: sorted.length,
-      itemBuilder: (context, i) =>
-          TopChartArtistRow(artist: sorted[i], rank: i + 1),
+      itemBuilder: (context, i) => TopChartArtistRow(
+        artist: sorted[i],
+        rank: i + 1,
+        onFlame: () => _state.toggleArtistFlame(sorted[i]),
+        onTap: () => _openArtist(sorted[i]),
+      ),
     );
   }
 
   Widget _buildTrackChart() {
-    final all = [...AppData.trendingTracks, ...AppData.freshDrops];
-    all.sort((a, b) => b.playCount.compareTo(a.playCount));
+    if (_state.loadingTracks) {
+      return const Center(
+        child: CircularProgressIndicator(color: VibeTuneTheme.primary),
+      );
+    }
+    final all = [..._state.tracks]
+      ..sort((a, b) => b.playCount.compareTo(a.playCount));
+    if (all.isEmpty) {
+      return const Center(
+        child: Text('No tracks yet.', style: TextStyle(color: VibeTuneTheme.textMuted)),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.only(top: 12, bottom: 40),
       itemCount: all.length,
-      itemBuilder: (context, i) => TrackRow(track: all[i], rank: i + 1),
+      itemBuilder: (context, i) => TrackRow(
+        track: all[i],
+        rank: i + 1,
+        onPlay: () => _state.playTrack(all[i], queue: all),
+        onLike: () => _state.toggleTrackLike(all[i]),
+      ),
     );
   }
 
   Widget _buildRisingChart() {
-    final rising = AppData.featuredArtists
+    if (_state.loadingArtists) {
+      return const Center(
+        child: CircularProgressIndicator(color: VibeTuneTheme.primary),
+      );
+    }
+    final rising = _state.artists
         .where((a) => a.trend == 'RISING' || a.trend == 'NEW')
-        .toList();
+        .toList()
+      ..sort((a, b) => b.flameCount.compareTo(a.flameCount));
+    if (rising.isEmpty) {
+      return const Center(
+        child: Text('Nothing rising right now.', style: TextStyle(color: VibeTuneTheme.textMuted)),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.only(top: 12, bottom: 40),
       itemCount: rising.length,
-      itemBuilder: (context, i) =>
-          TopChartArtistRow(artist: rising[i], rank: i + 1),
+      itemBuilder: (context, i) => TopChartArtistRow(
+        artist: rising[i],
+        rank: i + 1,
+        onFlame: () => _state.toggleArtistFlame(rising[i]),
+        onTap: () => _openArtist(rising[i]),
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+import '../services/app_state.dart';
+import '../widgets/now_playing_bar.dart';
 import 'home_screen.dart';
 import 'explore_screen.dart';
 import 'charts_screen.dart';
@@ -14,7 +16,23 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  int _currentIndex = 0;
+  final AppState _appState = AppState.instance;
+
+  int get _currentIndex => _appState.currentTab;
+
+  @override
+  void initState() {
+    super.initState();
+    _appState.addListener(_onStateChange);
+  }
+
+  void _onStateChange() => setState(() {});
+
+  @override
+  void dispose() {
+    _appState.removeListener(_onStateChange);
+    super.dispose();
+  }
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -62,7 +80,13 @@ class _AppShellState extends State<AppShell> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const NowPlayingBar(),
+          _buildBottomNav(),
+        ],
+      ),
     );
   }
 
@@ -100,7 +124,7 @@ class _AppShellState extends State<AppShell> {
             ],
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () => _appState.switchTab(3), // Community tab
             child: Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -139,7 +163,7 @@ class _AppShellState extends State<AppShell> {
               final isActive = _currentIndex == i;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(() => _currentIndex = i),
+                  onTap: () => _appState.switchTab(i),
                   behavior: HitTestBehavior.opaque,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),

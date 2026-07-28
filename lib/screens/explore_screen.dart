@@ -3,6 +3,7 @@ import '../theme/app_theme.dart';
 import '../services/app_state.dart';
 import '../models/models.dart';
 import '../widgets/widgets.dart';
+import 'artist_detail_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -23,6 +24,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   void _onStateChange() => setState(() {});
+
+  void _openArtist(Artist artist) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ArtistDetailScreen(artist: artist)),
+    );
+  }
 
   @override
   void dispose() {
@@ -198,7 +205,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, i) => ArtistGridCard(
                           artist: filtered[i],
-                          onTap: () {},
+                          onTap: () => _openArtist(filtered[i]),
                           onFlame: () => _state.toggleArtistFlame(filtered[i]),
                         ),
                         childCount: filtered.length,

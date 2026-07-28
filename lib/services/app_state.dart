@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import 'api_service.dart';
+import 'player_controller.dart';
 
 class AppState extends ChangeNotifier {
   static AppState? _instance;
   static AppState get instance => _instance ??= AppState._();
   AppState._();
+
+  // Bottom-nav tab index, driven from anywhere (e.g. hero banner CTAs)
+  // rather than only from the bottom nav bar itself.
+  int currentTab = 0;
+  void switchTab(int index) {
+    currentTab = index;
+    notifyListeners();
+  }
 
   List<Artist> artists = [];
   List<Track> tracks = [];
@@ -150,8 +159,11 @@ class AppState extends ChangeNotifier {
     await loadArtists();
   }
 
-  Future<void> playTrack(Track track) async {
-    ApiService.instance.registerPlay(track.id);
+  // Playback itself lives in PlayerController (handles Spotify preview
+  // streaming + fallback ticker); this just hands off the track and, when a
+  // queue is given, lets the mini-player's next/previous work correctly.
+  void playTrack(Track track, {List<Track>? queue}) {
+    PlayerController.instance.playTrack(track, queue: queue);
   }
 
   Future<void> toggleTrackLike(Track track) async {

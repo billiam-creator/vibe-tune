@@ -16,7 +16,7 @@ class FlameBadge extends StatelessWidget {
         Text('🔥', style: TextStyle(fontSize: small ? 10 : 13)),
         const SizedBox(width: 2),
         Text('$count',
-            style: TextStyle(color: VibeTuneTheme.accent, fontWeight: FontWeight.w800, fontSize: small ? 10 : 13)),
+            style: TextStyle(color: VibeTuneTheme.primary, fontWeight: FontWeight.w800, fontSize: small ? 10 : 13)),
       ],
     );
   }
